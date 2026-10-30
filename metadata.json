@@ -1,0 +1,6 @@
+{
+  "name": "짜임톡톡 - 중3 문장의 짜임 마스터",
+  "description": "중학교 3학년 국어 3단원 (1) 문장의 짜임을 치이카와풍 귀여운 캐릭터와 함께 단계별 퀴즈, 사전학습, 교과서 탐구, 맞춤형 문장 구조 분석기, 오답 노트로 재미있게 마스터하는 학습 앱입니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
