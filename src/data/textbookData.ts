@@ -4,10 +4,19 @@ export interface PdfMaterialItem {
   subtitle: string;
   pagesLabel: string;
   path: string;
+  pageImages: string[];
+  startBookPage?: number;
   highlights: string[];
 }
 
 const BASE_URL = import.meta.env.BASE_URL || './';
+
+function buildPageList(folder: string, count: number): string[] {
+  return Array.from({ length: count }, (_, idx) => {
+    const num = String(idx + 1).padStart(2, '0');
+    return `${BASE_URL}assets/pages/${folder}/page-${num}.jpg`;
+  });
+}
 
 export const PDF_MATERIALS: PdfMaterialItem[] = [
   {
@@ -16,6 +25,7 @@ export const PDF_MATERIALS: PdfMaterialItem[] = [
     subtitle: '문장의 짜임을 배우기 전 필수 기초 개념과 확인 문제',
     pagesLabel: '활동지 2쪽',
     path: `${BASE_URL}assets/aistudio/prelearning-worksheet.pdf`,
+    pageImages: buildPageList('prelearning', 2),
     highlights: [
       '단어의 태어난 신분 ‘품사(~사)’ 5언 9품사 정리표',
       '문장 속 직책 ‘문장 성분(~어)’ 7가지 핵심 역할',
@@ -24,14 +34,16 @@ export const PDF_MATERIALS: PdfMaterialItem[] = [
   },
   {
     id: 'pdf-textbook',
-    title: '중학 국어 3-2 교과서 본문: (1) 문장의 짜임',
-    subtitle: '학생용 교과서 본문·탐구 활동·학습 활동·우리말 달인 원문 수록',
-    pagesLabel: '교과서 114~134쪽 (학생용 원문)',
-    path: `${BASE_URL}assets/aistudio/textbook-unit3-1-student.pdf`,
+    title: '중학 국어 3-2 학생용 교과서 본문: (1) 문장의 짜임',
+    subtitle: '예시 답안이 없는 학생용 교과서 본문·탐구 활동·학습 활동·우리말 달인 수록',
+    pagesLabel: '학생용 교과서 114~134쪽 (총 21쪽)',
+    path: `${BASE_URL}assets/aistudio/student-textbook-unit3-1.pdf`,
+    pageImages: buildPageList('textbook-student', 21),
+    startBookPage: 114,
     highlights: [
-      '118~123쪽: 문장의 기본 구조 3유형과 주성분·부속 성분·독립 성분 탐구',
+      '118~123쪽: 문장의 기본 구조 3유형과 주성분·부속 성분·독립 성분 학생용 탐구',
       '124~128쪽: 홑문장과 겹문장, 이어진문장(대등·종속), 안은문장(명사·관형·부사·서술·인용절)',
-      '129~134쪽: 학습 활동 총정리, 표현 의도에 따른 문장 짓기, 우리말 톡톡(설렘/빠져듦/없음)',
+      '129~134쪽: 학습 활동 빈칸 정리, 표현 의도에 따른 문장 짓기, 우리말 톡톡(설렘/빠져듦/없음)',
     ],
   },
   {
@@ -40,6 +52,7 @@ export const PDF_MATERIALS: PdfMaterialItem[] = [
     subtitle: '중간·기말 내신 대비 객관식 및 조건부 서술형 기출 유형 모음',
     pagesLabel: '평가문제 8쪽',
     path: `${BASE_URL}assets/aistudio/exam-questions.pdf`,
+    pageImages: buildPageList('exam', 8),
     highlights: [
       '서술어의 3유형, 주성분만으로 이루어진 문장 찾기, 관형어·부사어 수식 탐구',
       '홑문장/겹문장 순서도 분류 및 대등·종속 이어진문장 의미 관계 구별',

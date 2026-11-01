@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { ArrowLeftRight, BookOpen, CheckCircle2, Download, FileText, Sparkles } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  BookOpen,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  FileText,
+  Sparkles,
+} from 'lucide-react';
 import {
   CLAUSE_SWAP_EXPERIMENTS,
   EMBEDDED_CLAUSE_CARDS,
@@ -21,12 +30,14 @@ export const TextbookView: React.FC<TextbookViewProps> = ({ onNavigateTab }) => 
   const [selectedClauseId, setSelectedClauseId] = useState<string>(EMBEDDED_CLAUSE_CARDS[0].id);
   const [mergedMap, setMergedMap] = useState<Record<string, boolean>>({});
   const [spellingPicks, setSpellingPicks] = useState<Record<string, string>>({});
-  const [selectedPdfId, setSelectedPdfId] = useState<string>(PDF_MATERIALS[0].id);
+  const [selectedPdfId, setSelectedPdfId] = useState<string>('pdf-textbook');
+  const [currentPageIdx, setCurrentPageIdx] = useState<number>(4); // Opens directly at 118쪽 (1) 문장의 짜임!
+  const [viewMode, setViewMode] = useState<'single' | 'scroll'>('single');
 
   const activeClause =
     EMBEDDED_CLAUSE_CARDS.find((c) => c.id === selectedClauseId) ?? EMBEDDED_CLAUSE_CARDS[0];
   const activePdf =
-    PDF_MATERIALS.find((p) => p.id === selectedPdfId) ?? PDF_MATERIALS[0];
+    PDF_MATERIALS.find((p) => p.id === selectedPdfId) ?? PDF_MATERIALS[1];
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-8">
@@ -446,7 +457,10 @@ export const TextbookView: React.FC<TextbookViewProps> = ({ onNavigateTab }) => 
                 <button
                   key={pdf.id}
                   type="button"
-                  onClick={() => setSelectedPdfId(pdf.id)}
+                  onClick={() => {
+                    setSelectedPdfId(pdf.id);
+                    setCurrentPageIdx(pdf.id === 'pdf-textbook' ? 4 : 0);
+                  }}
                   className={`text-left p-5 rounded-2xl border transition-colors flex flex-col justify-between gap-3 ${
                     selected
                       ? 'bg-[#FFF5F8] border-[#E11D48]'
@@ -471,7 +485,7 @@ export const TextbookView: React.FC<TextbookViewProps> = ({ onNavigateTab }) => 
           </div>
 
           <div className="bg-white rounded-3xl border border-[#ECE2D8] p-6 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#F3EAE2]">
               <div className="flex items-start gap-3">
                 <FileText className="w-6 h-6 text-[#E11D48] shrink-0 mt-0.5" />
                 <div>
@@ -486,7 +500,32 @@ export const TextbookView: React.FC<TextbookViewProps> = ({ onNavigateTab }) => 
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1 p-1 bg-[#F5EDE6] rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('single')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                      viewMode === 'single'
+                        ? 'bg-white text-[#2D2424] shadow-xs'
+                        : 'text-[#6E5D53] hover:text-[#2D2424]'
+                    }`}
+                  >
+                    한 쪽씩 보기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('scroll')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                      viewMode === 'scroll'
+                        ? 'bg-white text-[#2D2424] shadow-xs'
+                        : 'text-[#6E5D53] hover:text-[#2D2424]'
+                    }`}
+                  >
+                    전체 연속 보기
+                  </button>
+                </div>
+
                 <a
                   href={activePdf.path}
                   download={`${activePdf.title}.pdf`}
@@ -505,14 +544,110 @@ export const TextbookView: React.FC<TextbookViewProps> = ({ onNavigateTab }) => 
               </div>
             </div>
 
-            <div className="w-full h-[640px] rounded-2xl overflow-hidden border border-[#E5D9CE] bg-[#FAF6F2]">
-              <iframe
-                key={activePdf.path}
-                src={activePdf.path}
-                title={activePdf.title}
-                className="w-full h-full"
-              />
-            </div>
+            {viewMode === 'single' ? (
+              <div className="space-y-4">
+                {/* Page Navigation Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 bg-[#FAF6F2] px-4 py-3 rounded-2xl">
+                  <button
+                    type="button"
+                    disabled={currentPageIdx <= 0}
+                    onClick={() => setCurrentPageIdx((p) => Math.max(0, p - 1))}
+                    className={`inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                      currentPageIdx > 0
+                        ? 'bg-white hover:bg-[#FFF0F5] text-[#2D2424] border border-[#E5D9CE]'
+                        : 'bg-[#EFE8E1] text-[#A8998E] cursor-not-allowed'
+                    }`}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    이전 쪽
+                  </button>
+
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#2D2424]">
+                    <span className="font-mono tabular-nums">
+                      {currentPageIdx + 1} / {activePdf.pageImages.length}
+                    </span>
+                    {activePdf.startBookPage !== undefined && (
+                      <span className="text-[#BE123C] font-mono tabular-nums">
+                        (교과서 {activePdf.startBookPage + currentPageIdx}쪽)
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={currentPageIdx >= activePdf.pageImages.length - 1}
+                    onClick={() =>
+                      setCurrentPageIdx((p) =>
+                        Math.min(activePdf.pageImages.length - 1, p + 1)
+                      )
+                    }
+                    className={`inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                      currentPageIdx < activePdf.pageImages.length - 1
+                        ? 'bg-white hover:bg-[#FFF0F5] text-[#2D2424] border border-[#E5D9CE]'
+                        : 'bg-[#EFE8E1] text-[#A8998E] cursor-not-allowed'
+                    }`}
+                  >
+                    다음 쪽
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Quick Page Jump Strip for Textbook */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                  {activePdf.pageImages.map((_, pIdx) => {
+                    const label =
+                      activePdf.startBookPage !== undefined
+                        ? `${activePdf.startBookPage + pIdx}쪽`
+                        : `${pIdx + 1}쪽`;
+                    const isCurrent = pIdx === currentPageIdx;
+                    return (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => setCurrentPageIdx(pIdx)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-mono tabular-nums transition-colors whitespace-nowrap shrink-0 ${
+                          isCurrent
+                            ? 'bg-[#E11D48] text-white font-bold'
+                            : 'bg-[#F7F1EB] hover:bg-[#FFE4EC] text-[#5E4E46]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Single Crisp Page Display */}
+                <div className="rounded-2xl border border-[#E5D9CE] bg-[#FAF6F2] p-3 sm:p-6 flex justify-center">
+                  <img
+                    src={activePdf.pageImages[currentPageIdx]}
+                    alt={`${activePdf.title} ${currentPageIdx + 1}쪽`}
+                    referrerPolicy="no-referrer"
+                    className="max-w-full w-auto max-h-[820px] rounded-xl shadow-xs bg-white object-contain"
+                  />
+                </div>
+              </div>
+            ) : (
+              /* Continuous Scroll Mode */
+              <div className="max-h-[780px] overflow-y-auto rounded-2xl border border-[#E5D9CE] bg-[#FAF6F2] p-4 sm:p-6 space-y-6">
+                {activePdf.pageImages.map((imgSrc, pIdx) => (
+                  <div key={pIdx} className="space-y-2 flex flex-col items-center">
+                    <div className="text-xs font-mono tabular-nums text-[#7D6B5D]">
+                      {activePdf.startBookPage !== undefined
+                        ? `교과서 ${activePdf.startBookPage + pIdx}쪽 (${pIdx + 1} / ${activePdf.pageImages.length})`
+                        : `${pIdx + 1} / ${activePdf.pageImages.length}쪽`}
+                    </div>
+                    <img
+                      src={imgSrc}
+                      alt={`${activePdf.title} ${pIdx + 1}쪽`}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      className="max-w-3xl w-full rounded-xl shadow-xs bg-white"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
