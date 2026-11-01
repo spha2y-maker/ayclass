@@ -25,9 +25,9 @@ export const PDF_MATERIALS: PdfMaterialItem[] = [
   {
     id: 'pdf-textbook',
     title: '중학 국어 3-2 교과서 본문: (1) 문장의 짜임',
-    subtitle: '소단원 (1) 문장의 짜임 본문·탐구 활동·학습 활동·우리말 달인 수록',
-    pagesLabel: '교과서 114~134쪽 (경량화 원문)',
-    path: `${BASE_URL}assets/aistudio/textbook-unit3-1.pdf`,
+    subtitle: '학생용 교과서 본문·탐구 활동·학습 활동·우리말 달인 원문 수록',
+    pagesLabel: '교과서 114~134쪽 (학생용 원문)',
+    path: `${BASE_URL}assets/aistudio/textbook-unit3-1-student.pdf`,
     highlights: [
       '118~123쪽: 문장의 기본 구조 3유형과 주성분·부속 성분·독립 성분 탐구',
       '124~128쪽: 홑문장과 겹문장, 이어진문장(대등·종속), 안은문장(명사·관형·부사·서술·인용절)',
